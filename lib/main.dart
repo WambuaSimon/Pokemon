@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:pokemon/PokeHub.dart';
+import 'package:pokemon/pokemon.dart';
+import 'package:pokemon/pokemondetail.dart';
 
 void main() => runApp(MyApp());
 
@@ -62,6 +63,7 @@ class _MyHomePageState extends State<MyHomePage> {
 // print(res.body);
     var decodedJson = jsonDecode(res.body);
     pokeHub = PokeHub.fromJson(decodedJson);
+    setState(() {});
   }
 
   @override
@@ -80,10 +82,49 @@ class _MyHomePageState extends State<MyHomePage> {
         backgroundColor: Colors.cyan,
       ),
 
-      body: GridView.count(
-        crossAxisCount: 2,
-        children: pokeHub.pokemon.map((poke) => Card()).toList(),
-      ),
+      body: pokeHub == null
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : GridView.count(
+              crossAxisCount: 2,
+              children: pokeHub.pokemon
+                  .map((poke) => Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: InkWell(
+                          onTap: () {
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=> PokeDetail(
+                              pokemon:poke,
+                            )));
+                          },
+                          child: Hero(
+                            tag: poke.img,
+                            child: Card(
+                              elevation: 3.0,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: <Widget>[
+                                  Container(
+                                    height: 100.0,
+                                    width: 100.0,
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                            image: NetworkImage(poke.img))),
+                                  ),
+                                  Text(
+                                    poke.name,
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 20.0),
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ))
+                  .toList(),
+            ),
       drawer: Drawer(),
 
       floatingActionButton: FloatingActionButton(
